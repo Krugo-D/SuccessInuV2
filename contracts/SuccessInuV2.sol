@@ -1,4 +1,4 @@
-pragma solidity ^0.6.12;
+pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: Unlicensed
 
@@ -232,7 +232,7 @@ library SafeMath {
 
 abstract contract Context {
     function _msgSender() internal view virtual returns (address payable) {
-        return msg.sender;
+        return payable(msg.sender);
     }
 
     function _msgData() internal view virtual returns (bytes memory) {
@@ -402,7 +402,7 @@ contract Ownable is Context {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    constructor () internal {
+    constructor () {
         address msgSender = _msgSender();
         _owner = msgSender;
         emit OwnershipTransferred(address(0), msgSender);
@@ -762,7 +762,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         inSwapAndLiquify = false;
     }
 
-    constructor () public {
+    constructor () {
         _rOwned[_msgSender()] = _rTotal;
         IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);  // UNI ROUTER V2
         // Create a uniswap pair for this new token
