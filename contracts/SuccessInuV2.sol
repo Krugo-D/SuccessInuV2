@@ -726,16 +726,9 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     uint8 private _decimals = 9;
 
     uint256 public _taxFee = 1;
-    uint256 private _previousTaxFee = _taxFee;
-
     uint256 public _burnFee = 1;
-    uint256 private _previousBurnFee = _burnFee;
-
     uint256 public _marketingFee = 2;
-    uint256 private _previousMarketingFee = _marketingFee;
-
     uint256 public _liquidityFee = 1;
-    uint256 private _previousLiquidityFee = _liquidityFee;
 
     address public marketingFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
 
@@ -745,8 +738,8 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = false;
 
-    uint256 public _maxTxAmount = 5000000 * 10**6 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 500000 * 10**6 * 10**9;
+    uint256 public _maxTxAmount = _tTotal * 5 / 100; // 5% of Max Total Supply
+    uint256 private numTokensSellToAddToLiquidity = _tTotal * 5 / 10_000; // 0.05% of Max Total Supply
 
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -1176,25 +1169,17 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     //Call this function after finalizing the presale
     function enableAllFees() external onlyOwner {
         _taxFee       = 1;
-        _previousTaxFee = _taxFee;
         _burnFee      = 1;
-        _previousBurnFee = _taxFee;
-        _marketingFee = 1;
-        _previousMarketingFee = _marketingFee;
+        _marketingFee = 2;
         _liquidityFee = 1;
-        _previousLiquidityFee = _liquidityFee;
         setSwapAndLiquifyEnabled(true);
     }
 
     function disableAllFees() external onlyOwner {
         _taxFee       = 0;
-        _previousTaxFee = _taxFee;
         _burnFee      = 0;
-        _previousBurnFee = _taxFee;
         _marketingFee = 0;
-        _previousMarketingFee = _marketingFee;
         _liquidityFee = 0;
-        _previousLiquidityFee = _liquidityFee;
         setSwapAndLiquifyEnabled(false);
     }
 
