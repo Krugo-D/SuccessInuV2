@@ -1,3 +1,15 @@
+/**
+ *Submitted for verification at BscScan.com on 2021-09-03
+*/
+
+/*
+
+https://successinu.online
+https://t.me/SuccessInuOfficial
+BSC Token
+
+*/
+
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: Unlicensed
@@ -658,27 +670,22 @@ interface IUniswapV2Router02 is IUniswapV2Router01 {
     ) external;
 }
 
-//   ________  ___  ___  ________  ________  _______   ________   ________  ___  ________   ___  ___     
-//  |\   ____\|\  \|\  \|\   ____\|\   ____\|\  ___ \ |\   ____\ |\   ____\|\  \|\   ___  \|\  \|\  \    
-//  \ \  \___|\ \  \\\  \ \  \___|\ \  \___|\ \   __/|\ \  \___|_\ \  \___|\ \  \ \  \\ \  \ \  \\\  \   
-//   \ \_____  \ \  \\\  \ \  \    \ \  \    \ \  \_|/_\ \_____  \\ \_____  \ \  \ \  \\ \  \ \  \\\  \  
-//    \|____|\  \ \  \\\  \ \  \____\ \  \____\ \  \_|\ \|____|\  \\|____|\  \ \  \ \  \\ \  \ \  \\\  \ 
-//      ____\_\  \ \_______\ \_______\ \_______\ \_______\____\_\  \ ____\_\  \ \__\ \__\\ \__\ \_______\
-//     |\_________\|_______|\|_______|\|_______|\|_______|\_________\\_________\|__|\|__| \|__|\|_______|
-//     \|_________|                                      \|_________\|_________|                         
-//                                                                                                                                                                                                            
-//  Transferfee 5% || 1% Redistribution, 1% Burn, 1% Liquidity, 2% Marketing
 
-contract SuccessInuV2 is Context, IERC20, Ownable {
+
+
+//    SuccessInu V3
+
+contract SuccessInuV3 is Context, IERC20, Ownable {
     using SafeMath for uint256;
     using Address for address;
+
 
     struct RValuesStruct {
         uint256 rAmount;
         uint256 rTransferAmount;
         uint256 rFee;
         uint256 rBurn;
-        uint256 rMarketing;
+        uint256 rMarketingAndTeam;
         uint256 rLiquidity;
     }
 
@@ -686,7 +693,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         uint256 tTransferAmount;
         uint256 tFee;
         uint256 tBurn;
-        uint256 tMarketing;
+        uint256 tMarketingAndTeam;
         uint256 tLiquidity;
     }
 
@@ -695,12 +702,12 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         uint256 rTransferAmount;
         uint256 rFee;
         uint256 rBurn;
-        uint256 rMarketing;
+        uint256 rMarketingAndTeam;
         uint256 rLiquidity;
         uint256 tTransferAmount;
         uint256 tFee;
         uint256 tBurn;
-        uint256 tMarketing;
+        uint256 tMarketingAndTeam;
         uint256 tLiquidity;
     }
 
@@ -719,16 +726,23 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     uint256 private _tFeeTotal;
     uint256 private _tBurnTotal;
 
-    string private _name = "SuccessInuV2";
-    string private _symbol = "SUCCESS2";
+    string private _name = "SUCCESS INU";
+    string private _symbol = "SUCCESS";
     uint8 private _decimals = 9;
 
     uint256 public _taxFee = 1;
-    uint256 public _burnFee = 1;
-    uint256 public _marketingFee = 2;
-    uint256 public _liquidityFee = 1;
+    uint256 private _previousTaxFee = _taxFee;
 
-    address marketingFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
+    uint256 public _burnFee = 1;
+    uint256 private _previousBurnFee = _burnFee;
+
+    uint256 public _marketingAndTeamFee = 2;
+    uint256 private _previousMarketingAndTeamFee = _marketingAndTeamFee;
+
+    uint256 public _liquidityFee = 1;
+    uint256 private _previousLiquidityFee = _liquidityFee;
+
+    address public marketingAndTeamFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -736,8 +750,10 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     bool inSwapAndLiquify;
     bool public swapAndLiquifyEnabled = false;
 
-    uint256 public _maxTxAmount = _tTotal * 5 / 100; // 5% of Max Total Supply
-    uint256 private numTokensSellToAddToLiquidity = _tTotal * 5 / 10_000; // 0.05% of Max Total Supply
+    bool public tradingEnabled = false;
+
+    uint256 public _maxTxAmount = 5 * 10**9 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 500 * 10**6 * 10**9;
 
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -753,9 +769,11 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         inSwapAndLiquify = false;
     }
 
-    constructor () {
+    constructor () public {
         _rOwned[_msgSender()] = _rTotal;
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);  // UNI ROUTER V2
+        //0x10ED43C718714eb63d5aA57B78B54704E256024E
+        //0xD99D1c33F9fC3444f8101754aBC46c52416550D1
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);  // PCS V2
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
         .createPair(address(this), _uniswapV2Router.WETH());
@@ -763,10 +781,9 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         // set the rest of the contract variables
         uniswapV2Router = _uniswapV2Router;
 
-        //exclude owner, this contract and marketing wallet from fees
+        //exclude owner and this contract from fee
         _isExcludedFromFee[owner()] = true;
         _isExcludedFromFee[address(this)] = true;
-        _isExcludedFromFee[marketingFeeWallet] = true;
 
         emit Transfer(address(0), _msgSender(), _tTotal);
     }
@@ -834,6 +851,16 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         return _tBurnTotal;
     }
 
+    function deliver(uint256 tAmount) public {
+        address sender = _msgSender();
+        require(!_isExcluded[sender], "Excluded addresses cannot call this function");
+        uint256 currentRate = _getRate();
+        uint256 rAmount = tAmount.mul(currentRate);
+        _rOwned[sender] = _rOwned[sender].sub(rAmount);
+        _rTotal = _rTotal.sub(rAmount);
+        _tFeeTotal = _tFeeTotal.add(tAmount);
+    }
+
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) public view returns(uint256) {
         require(tAmount <= _tTotal, "Amount must be less than supply");
         if (!deductTransferFee) {
@@ -851,7 +878,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         return rAmount.div(currentRate);
     }
 
-    function excludeFromReward(address account) public onlyOwner {
+    function excludeFromReward(address account) public onlyOwner() {
         require(account != 0x10ED43C718714eb63d5aA57B78B54704E256024E, 'We can not exclude Pancake router.');
         require(!_isExcluded[account], "Account is already excluded");
         require(_excluded.length < 50, "Excluded list is too long");
@@ -862,56 +889,36 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         _excluded.push(account);
     }
 
-    function includeInReward(address account) external onlyOwner {
-        require(_isExcluded[account], "Account is already excluded");
-        for (uint256 i = 0; i < _excluded.length; i++) {
-            if (_excluded[i] == account) {
-                _excluded[i] = _excluded[_excluded.length - 1];
-                _tOwned[account] = 0;
-                _isExcluded[account] = false;
-                _excluded.pop();
-                break;
-            }
-        }
-    }
-
     //to recieve ETH from uniswapV2Router when swaping
     receive() external payable {}
 
-    function _distributeFee(uint256 rFee, uint256 rBurn, uint256 rMarketing, uint256 tFee, uint256 tBurn, uint256 tMarketing) private {
+    function _distributeFee(uint256 rFee, uint256 rBurn, uint256 rMarketingAndTeam, uint256 tFee, uint256 tBurn, uint256 tMarketingAndTeam) private {
         _rTotal = _rTotal.sub(rFee).sub(rBurn);
         _tFeeTotal = _tFeeTotal.add(tFee);
         _tTotal = _tTotal.sub(tBurn);
         _tBurnTotal = _tBurnTotal.add(tBurn);
 
-        _rOwned[marketingFeeWallet] = _rOwned[marketingFeeWallet].add(rMarketing);
-        if (_isExcluded[marketingFeeWallet]) {
-            _tOwned[marketingFeeWallet] = _tOwned[marketingFeeWallet].add(tMarketing);
+        _rOwned[marketingAndTeamFeeWallet] = _rOwned[marketingAndTeamFeeWallet].add(rMarketingAndTeam);
+        if (_isExcluded[marketingAndTeamFeeWallet]) {
+            _tOwned[marketingAndTeamFeeWallet] = _tOwned[marketingAndTeamFeeWallet].add(tMarketingAndTeam);
         }
-        // Check if MarketingFeeWallet has SUCCESS, if so automatically swap to ETH
-        if (balanceOf(marketingFeeWallet) > 0) {
-            uint256 amountToSwap = balanceOf(marketingFeeWallet);
-            swapTokensForEth(amountToSwap);
-            // Send the amount of ETH in contract after swap to the MarketingWallet
-            payable(marketingFeeWallet).transfer(address(this).balance);
-        } 
     }
 
     function _getValues(uint256 tAmount) private view returns (ValuesStruct memory) {
         TValuesStruct memory tvs = _getTValues(tAmount);
-        RValuesStruct memory rvs = _getRValues(tAmount, tvs.tFee, tvs.tBurn, tvs.tMarketing, tvs.tLiquidity, _getRate());
+        RValuesStruct memory rvs = _getRValues(tAmount, tvs.tFee, tvs.tBurn, tvs.tMarketingAndTeam, tvs.tLiquidity, _getRate());
 
         return ValuesStruct(
             rvs.rAmount,
             rvs.rTransferAmount,
             rvs.rFee,
             rvs.rBurn,
-            rvs.rMarketing,
+            rvs.rMarketingAndTeam,
             rvs.rLiquidity,
             tvs.tTransferAmount,
             tvs.tFee,
             tvs.tBurn,
-            tvs.tMarketing,
+            tvs.tMarketingAndTeam,
             tvs.tLiquidity
         );
     }
@@ -919,20 +926,20 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     function _getTValues(uint256 tAmount) private view returns (TValuesStruct memory) {
         uint256 tFee = calculateTaxFee(tAmount);
         uint256 tBurn = calculateBurnFee(tAmount);
-        uint256 tMarketing = calculateMarketingAndTeamFee(tAmount);
+        uint256 tMarketingAndTeam = calculateMarketingAndTeamFee(tAmount);
         uint256 tLiquidity = calculateLiquidityFee(tAmount);
-        uint256 tTransferAmount = tAmount.sub(tFee).sub(tBurn).sub(tMarketing).sub(tLiquidity);
-        return TValuesStruct(tTransferAmount, tFee, tBurn, tMarketing, tLiquidity);
+        uint256 tTransferAmount = tAmount.sub(tFee).sub(tBurn).sub(tMarketingAndTeam).sub(tLiquidity);
+        return TValuesStruct(tTransferAmount, tFee, tBurn, tMarketingAndTeam, tLiquidity);
     }
 
-    function _getRValues(uint256 tAmount, uint256 tFee, uint256 tBurn, uint256 tMarketing, uint256 tLiquidity, uint256 currentRate) private pure returns (RValuesStruct memory) {
+    function _getRValues(uint256 tAmount, uint256 tFee, uint256 tBurn, uint256 tMarketingAndTeam, uint256 tLiquidity, uint256 currentRate) private pure returns (RValuesStruct memory) {
         uint256 rAmount = tAmount.mul(currentRate);
         uint256 rFee = tFee.mul(currentRate);
         uint256 rBurn = tBurn.mul(currentRate);
-        uint256 rMarketing = tMarketing.mul(currentRate);
+        uint256 rMarketingAndTeam = tMarketingAndTeam.mul(currentRate);
         uint256 rLiquidity = tLiquidity.mul(currentRate);
-        uint256 rTransferAmount = rAmount.sub(rFee).sub(rLiquidity).sub(rBurn).sub(rMarketing);
-        return RValuesStruct(rAmount, rTransferAmount, rFee, rBurn, rMarketing, rLiquidity);
+        uint256 rTransferAmount = rAmount.sub(rFee).sub(rLiquidity).sub(rBurn).sub(rMarketingAndTeam);
+        return RValuesStruct(rAmount, rTransferAmount, rFee, rBurn, rMarketingAndTeam, rLiquidity);
     }
 
     function _getRate() private view returns(uint256) {
@@ -971,7 +978,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     }
 
     function calculateMarketingAndTeamFee(uint256 _amount) private view returns (uint256) {
-        return _amount.mul(_marketingFee).div(
+        return _amount.mul(_marketingAndTeamFee).div(
             10**2
         );
     }
@@ -986,13 +993,13 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         _taxFee       = 0;
         _liquidityFee = 0;
         _burnFee      = 0;
-        _marketingFee = 0;
+        _marketingAndTeamFee = 0;
     }
 
     function restoreAllFee() private {
         _taxFee       = 1;
         _liquidityFee = 1;
-        _marketingFee = 1;
+        _marketingAndTeamFee = 2;
         _burnFee      = 1;
 
     }
@@ -1017,8 +1024,12 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         require(from != address(0), "ERC20: transfer from the zero address");
         require(to != address(0), "ERC20: transfer to the zero address");
         require(amount > 0, "Transfer amount must be greater than zero");
-        require(to != address(this), "Can not transfer this contracts token to its own address");
-
+        
+        // block trading until owner has added liquidity and enabled trading
+        if(!tradingEnabled && from != owner()) {
+            revert("Trading not yet enabled!");
+        }
+        
         // is the token balance of this contract address over the min number of
         // tokens that we need to initiate a swap + liquidity lock?
         // also, don't get caught in a circular liquidity event.
@@ -1098,7 +1109,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
 
     //this method is responsible for taking all fee, if takeFee is true
     function _tokenTransfer(address sender, address recipient, uint256 amount) private {
-
         if(_isExcludedFromFee[sender] || _isExcludedFromFee[recipient]){
             removeAllFee();
         }
@@ -1108,7 +1118,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
 
         ValuesStruct memory vs = _getValues(amount);
         _takeLiquidity(vs.rLiquidity, vs.tLiquidity);
-        _distributeFee(vs.rFee, vs.rBurn, vs.rMarketing, vs.tFee, vs.tBurn, vs.tMarketing);
+        _distributeFee(vs.rFee, vs.rBurn, vs.rMarketingAndTeam, vs.tFee, vs.tBurn, vs.tMarketingAndTeam);
 
         if (_isExcluded[sender] && !_isExcluded[recipient]) {
             _transferFromExcluded(sender, recipient, amount, vs);
@@ -1160,27 +1170,37 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         _isExcludedFromFee[account] = false;
     }
 
-    function setMarketingFeeWallet(address newWallet) external onlyOwner {
-        marketingFeeWallet = newWallet;
+    function enableAllFees() external onlyOwner() {
+        _taxFee       = 1;
+        _previousTaxFee = _taxFee;
+        _burnFee      = 1;
+        _previousBurnFee = _taxFee;
+        _marketingAndTeamFee = 2;
+        _previousMarketingAndTeamFee = _marketingAndTeamFee;
+        _liquidityFee = 1;
+        _previousLiquidityFee = _liquidityFee;
+        setSwapAndLiquifyEnabled(true);
     }
 
-    //takes the desired maxTxPercentage multiplied by 10 to enable decimal point percentages
-    function setMaxTxPercent(uint256 maxTxPercentMultipliedByTen) external onlyOwner() {
-        require(maxTxPercentMultipliedByTen > 1, "Cannot set transaction amount less than 0.1%!");
-        _maxTxAmount = _tTotal.mul(maxTxPercentMultipliedByTen).div(
-            10**3
-        );
+    function disableAllFees() external onlyOwner() {
+        _taxFee       = 0;
+        _previousTaxFee = _taxFee;
+        _burnFee      = 0;
+        _previousBurnFee = _taxFee;
+        _marketingAndTeamFee = 0;
+        _previousMarketingAndTeamFee = _marketingAndTeamFee;
+        _liquidityFee = 0;
+        _previousLiquidityFee = _liquidityFee;
+        setSwapAndLiquifyEnabled(false);
     }
 
-    //Use this in case ETH are sent to the contract by mistake
-    function rescueETH(uint256 weiAmount) external onlyOwner{
-        require(address(this).balance >= weiAmount, "insufficient ETH balance");
-        payable(owner()).transfer(weiAmount);
+    function setMarketingAndTeamWallet(address newWallet) external onlyOwner() {
+        marketingAndTeamFeeWallet = newWallet;
     }
-    
-    // Function to allow admin to claim *other* ERC20 tokens sent to this contract (by mistake)
-    function rescueAnyERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
-        IERC20(_tokenAddr).transfer(_to, _amount);
+
+    function setMaxTxAmount(uint256 maxAmountInTokensWithDecimals) external onlyOwner() {
+        require(maxAmountInTokensWithDecimals > 100 * 10**6 * 10**9, "Cannot set transaction amount less than 0.1 percent of initial Total Supply!");
+        _maxTxAmount = maxAmountInTokensWithDecimals;
     }
 
     function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
@@ -1188,21 +1208,9 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         emit SwapAndLiquifyEnabledUpdated(_enabled);
     }
 
-    function enableAllFees() external onlyOwner {
-        _taxFee       = 1;
-        _burnFee      = 1;
-        _marketingFee = 2;
-        _liquidityFee = 1;
-        setSwapAndLiquifyEnabled(true);
+    function enableTrading() public onlyOwner {
+        require(!tradingEnabled, "Trading already enabled!");
+        tradingEnabled = true;
     }
-
-    function disableAllFees() external onlyOwner {
-        _taxFee       = 0;
-        _burnFee      = 0;
-        _marketingFee = 0;
-        _liquidityFee = 0;
-        setSwapAndLiquifyEnabled(false);
-    }
-
 
 }

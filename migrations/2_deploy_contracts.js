@@ -1,5 +1,5 @@
-const MollyCoin = artifacts.require("MollyCoin");
+const SuccessInuV2 = artifacts.require("SuccessInuV2");
 
 module.exports = function (deployer) {
-  deployer.deploy(MollyCoin);
+  deployer.deploy(SuccessInuV2);
 };
