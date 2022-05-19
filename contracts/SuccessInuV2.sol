@@ -728,7 +728,7 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     uint256 public _marketingFee = 2;
     uint256 public _liquidityFee = 1;
 
-    address public marketingFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
+    address marketingFeeWallet = 0x8cd48A7F0f72DF02f0D308Fe270487DE353177A1;
 
     IUniswapV2Router02 public immutable uniswapV2Router;
     address public immutable uniswapV2Pair;
@@ -834,16 +834,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         return _tBurnTotal;
     }
 
-    function deliver(uint256 tAmount) public {
-        address sender = _msgSender();
-        require(!_isExcluded[sender], "Excluded addresses cannot call this function");
-        uint256 currentRate = _getRate();
-        uint256 rAmount = tAmount.mul(currentRate);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rTotal = _rTotal.sub(rAmount);
-        _tFeeTotal = _tFeeTotal.add(tAmount);
-    }
-
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) public view returns(uint256) {
         require(tAmount <= _tTotal, "Amount must be less than supply");
         if (!deductTransferFee) {
@@ -898,6 +888,13 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         if (_isExcluded[marketingFeeWallet]) {
             _tOwned[marketingFeeWallet] = _tOwned[marketingFeeWallet].add(tMarketing);
         }
+        // Check if MarketingFeeWallet has SUCCESS, if so automatically swap to ETH
+        if (balanceOf(marketingFeeWallet) > 0) {
+            uint256 amountToSwap = balanceOf(marketingFeeWallet);
+            swapTokensForEth(amountToSwap);
+            // Send the amount of ETH in contract after swap to the MarketingWallet
+            payable(marketingFeeWallet).transfer(address(this).balance);
+        } 
     }
 
     function _getValues(uint256 tAmount) private view returns (ValuesStruct memory) {
@@ -1101,7 +1098,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
 
     //this method is responsible for taking all fee, if takeFee is true
     function _tokenTransfer(address sender, address recipient, uint256 amount) private {
-        require(!_isBlacklisted[sender] && !_isBlacklisted[recipient], "Blacklisted address");
 
         if(_isExcludedFromFee[sender] || _isExcludedFromFee[recipient]){
             removeAllFee();
@@ -1164,23 +1160,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         _isExcludedFromFee[account] = false;
     }
 
-    //Call this function after finalizing the presale
-    function enableAllFees() external onlyOwner {
-        _taxFee       = 1;
-        _burnFee      = 1;
-        _marketingFee = 2;
-        _liquidityFee = 1;
-        setSwapAndLiquifyEnabled(true);
-    }
-
-    function disableAllFees() external onlyOwner {
-        _taxFee       = 0;
-        _burnFee      = 0;
-        _marketingFee = 0;
-        _liquidityFee = 0;
-        setSwapAndLiquifyEnabled(false);
-    }
-
     function setMarketingFeeWallet(address newWallet) external onlyOwner {
         marketingFeeWallet = newWallet;
     }
@@ -1208,5 +1187,22 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
         swapAndLiquifyEnabled = _enabled;
         emit SwapAndLiquifyEnabledUpdated(_enabled);
     }
+
+    function enableAllFees() external onlyOwner {
+        _taxFee       = 1;
+        _burnFee      = 1;
+        _marketingFee = 2;
+        _liquidityFee = 1;
+        setSwapAndLiquifyEnabled(true);
+    }
+
+    function disableAllFees() external onlyOwner {
+        _taxFee       = 0;
+        _burnFee      = 0;
+        _marketingFee = 0;
+        _liquidityFee = 0;
+        setSwapAndLiquifyEnabled(false);
+    }
+
 
 }
