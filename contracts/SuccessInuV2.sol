@@ -708,8 +708,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     mapping (address => uint256) private _tOwned;
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    mapping(address => bool) public _isBlacklisted;
-
     mapping (address => bool) private _isExcludedFromFee;
 
     mapping (address => bool) private _isExcluded;
@@ -1204,10 +1202,6 @@ contract SuccessInuV2 is Context, IERC20, Ownable {
     // Function to allow admin to claim *other* ERC20 tokens sent to this contract (by mistake)
     function rescueAnyERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
         IERC20(_tokenAddr).transfer(_to, _amount);
-    }
-
-    function blacklistAddress(address account, bool value) external onlyOwner {
-        _isBlacklisted[account] = value;
     }
 
     function setSwapAndLiquifyEnabled(bool _enabled) public onlyOwner {
