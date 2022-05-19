@@ -1213,4 +1213,15 @@ contract SuccessInuV3 is Context, IERC20, Ownable {
         tradingEnabled = true;
     }
 
+    //Use this in case ETH are sent to the contract by mistake
+    function rescueETH(uint256 weiAmount) external onlyOwner{
+        require(address(this).balance >= weiAmount, "insufficient ETH balance");
+        payable(owner()).transfer(weiAmount);
+    }
+    
+    // Function to allow admin to claim *other* ERC20 tokens sent to this contract (by mistake)
+    function rescueAnyERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
+        IERC20(_tokenAddr).transfer(_to, _amount);
+    }
+
 }
