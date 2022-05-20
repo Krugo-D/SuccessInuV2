@@ -1,15 +1,3 @@
-/**
- *Submitted for verification at BscScan.com on 2021-09-03
-*/
-
-/*
-
-https://successinu.online
-https://t.me/SuccessInuOfficial
-BSC Token
-
-*/
-
 pragma solidity ^0.8.0;
 
 // SPDX-License-Identifier: Unlicensed
@@ -753,7 +741,7 @@ contract SuccessInuV3 is Context, IERC20, Ownable {
     bool public tradingEnabled = false;
 
     uint256 public _maxTxAmount = 5 * 10**9 * 10**9;
-    uint256 private numTokensSellToAddToLiquidity = 500 * 10**6 * 10**9;
+    uint256 private numTokensSellToAddToLiquidity = 50 * 10**6 * 10**9;
 
     event MinTokensBeforeSwapUpdated(uint256 minTokensBeforeSwap);
     event SwapAndLiquifyEnabledUpdated(bool enabled);
@@ -769,11 +757,9 @@ contract SuccessInuV3 is Context, IERC20, Ownable {
         inSwapAndLiquify = false;
     }
 
-    constructor () public {
+    constructor () {
         _rOwned[_msgSender()] = _rTotal;
-        //0x10ED43C718714eb63d5aA57B78B54704E256024E
-        //0xD99D1c33F9fC3444f8101754aBC46c52416550D1
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);  // PCS V2
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D);  // UNISWAP ROUTER V2
         // Create a uniswap pair for this new token
         uniswapV2Pair = IUniswapV2Factory(_uniswapV2Router.factory())
         .createPair(address(this), _uniswapV2Router.WETH());
@@ -849,16 +835,6 @@ contract SuccessInuV3 is Context, IERC20, Ownable {
 
     function totalBurn() public view returns (uint256) {
         return _tBurnTotal;
-    }
-
-    function deliver(uint256 tAmount) public {
-        address sender = _msgSender();
-        require(!_isExcluded[sender], "Excluded addresses cannot call this function");
-        uint256 currentRate = _getRate();
-        uint256 rAmount = tAmount.mul(currentRate);
-        _rOwned[sender] = _rOwned[sender].sub(rAmount);
-        _rTotal = _rTotal.sub(rAmount);
-        _tFeeTotal = _tFeeTotal.add(tAmount);
     }
 
     function reflectionFromToken(uint256 tAmount, bool deductTransferFee) public view returns(uint256) {
@@ -1208,18 +1184,19 @@ contract SuccessInuV3 is Context, IERC20, Ownable {
         emit SwapAndLiquifyEnabledUpdated(_enabled);
     }
 
+    //  This function can only be called once
     function enableTrading() public onlyOwner {
         require(!tradingEnabled, "Trading already enabled!");
         tradingEnabled = true;
     }
 
-    //Use this in case ETH are sent to the contract by mistake
+    //  Use this in case ETH are sent to the contract by mistake
     function rescueETH(uint256 weiAmount) external onlyOwner{
         require(address(this).balance >= weiAmount, "insufficient ETH balance");
         payable(owner()).transfer(weiAmount);
     }
     
-    // Function to allow admin to claim *other* ERC20 tokens sent to this contract (by mistake)
+    //  Function to allow admin to claim *other* ERC20 tokens sent to this contract (by mistake)
     function rescueAnyERC20Tokens(address _tokenAddr, address _to, uint _amount) public onlyOwner {
         IERC20(_tokenAddr).transfer(_to, _amount);
     }
